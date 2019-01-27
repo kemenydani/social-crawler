@@ -17,6 +17,11 @@ use App\lib\DB;
 use App\config\DataBaseConfigInterface;
 use App\lib\TimeMachine;
 use App\model\twitter\TwitterPost;
+use App\model\twitter\TwitterPostCoordinates;
+use App\model\twitter\TwitterPostEntities;
+use App\model\twitter\TwitterPostGeo;
+use App\model\twitter\TwitterPostPlace;
+use App\model\twitter\TwitterPostUser;
 
 class TwitterAPIDataCrawler extends APIDataCrawler implements TwitterDataCrawlerInterface
 {
@@ -45,13 +50,54 @@ class TwitterAPIDataCrawler extends APIDataCrawler implements TwitterDataCrawler
 
         foreach($posts as $twitterPost)
         {
-            /* @var $twitterPost TwitterPost */
+            /* @var TwitterPostUser $twitterPostUser */
+            $twitterPostUser = new TwitterPostUser(
+                json_encode($twitterPost->getUser())
+            );
 
+            /* @var TwitterPostUser $twitterPostPlace */
+            $twitterPostPlace = new TwitterPostPlace(
+                json_encode($twitterPost->getPlace())
+            );
+
+            $twitterGeo = new TwitterPostGeo(
+                json_encode($twitterPost->getGeo())
+            );
+
+            $twitterCoordinates = new TwitterPostCoordinates(
+                json_encode($twitterPost->getCoordinates())
+            );
+
+            $posX = count($twitterGeo->getCoordinates()) ? $twitterCoordinates->getX() : $twitterGeo->getX();
+            $posY = count($twitterGeo->getCoordinates()) ? $twitterCoordinates->getY() : $twitterGeo->getY();
+
+            $twitterEntities = new TwitterPostEntities(
+                json_encode($twitterPost->getEntities())
+            );
+
+            $hashTags = $twitterEntities->getOrderedHashTagList();
+
+            /* @var TwitterPost $twitterPost */
             $this->DataBaseHandler->insert('post', [
                 'extId' => $twitterPost->getId(),
                 'content' => $twitterPost->getText(),
+                'placeExtId' => $twitterPostPlace->getId(),
+                'userExtId' => $twitterPostUser->getId(),
+                'posX' => $posX,
+                'posY' => $posY,
+                'hashTags' => $hashTags,
                 'postedAt' => TimeMachine::formatToDateTime($twitterPost->getCreatedAt()),
-                'rawData' => (string)$twitterPost->toJSON()
+                'rawData' => $twitterPost->toJSON()
+            ]);
+
+            $this->DataBaseHandler->insert('user', [
+                'extId' => $twitterPostUser->getId(),
+                'rawData' => $twitterPostUser->toJSON()
+            ]);
+
+            $this->DataBaseHandler->insert('place', [
+                'extId' => $twitterPostPlace->getId(),
+                'rawData' => $twitterPostPlace->toJSON()
             ]);
         }
 

@@ -16,15 +16,21 @@ trait JSON
         return json_encode($this);
     }
 
-    public function populateFromJSON(string $jsonString)
+    public function populateFromJSON(?string $jsonString)
     {
-        $stdClass = json_decode($jsonString);
-
-        foreach(get_object_vars($stdClass) as $propertyName => $propertyValue)
+        if (is_string($jsonString))
         {
-            if(property_exists(__CLASS__, $propertyName))
+            $stdClass = json_decode($jsonString);
+
+            if (is_object($stdClass))
             {
-                $this->$propertyName = $propertyValue;
+                foreach(get_object_vars($stdClass) as $propertyName => $propertyValue)
+                {
+                    if(property_exists(__CLASS__, $propertyName))
+                    {
+                        $this->$propertyName = $propertyValue;
+                    }
+                }
             }
         }
     }

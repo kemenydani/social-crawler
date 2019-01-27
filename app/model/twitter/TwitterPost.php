@@ -205,25 +205,25 @@ class TwitterPost
     }
 
     /**
-     * @return TwitterPostEntities
+     * @return
      */
-    public function getEntities(): ?TwitterPostEntities
+    public function getEntities()
     {
         return $this->entities;
     }
 
     /**
-     * @param TwitterPostEntities $entities
+     * @param  $entities
      */
-    public function setEntities(TwitterPostEntities $entities): void
+    public function setEntities($entities): void
     {
         $this->entities = $entities;
     }
 
     /**
-     * @return TwitterPostMetaData
+     * @return
      */
-    public function getMetadata(): ?TwitterPostMetaData
+    public function getMetadata()
     {
         return $this->metadata;
     }
@@ -231,7 +231,7 @@ class TwitterPost
     /**
      * @param mixed $metadata
      */
-    public function setMetadata(TwitterPostMetaData $metadata): void
+    public function setMetadata($metadata): void
     {
         $this->metadata = $metadata;
     }
