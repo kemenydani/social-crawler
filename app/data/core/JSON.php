@@ -1,0 +1,31 @@
+<?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: Daniel Kemeny
+ * TimeMachine: 26.01.2019
+ * Time: 17:25
+ */
+
+namespace App\data\core;
+
+
+trait JSON
+{
+    public function toJSON()
+    {
+        return json_encode($this);
+    }
+
+    public function populateFromJSON(string $jsonString)
+    {
+        $stdClass = json_decode($jsonString);
+
+        foreach(get_object_vars($stdClass) as $propertyName => $propertyValue)
+        {
+            if(property_exists(__CLASS__, $propertyName))
+            {
+                $this->$propertyName = $propertyValue;
+            }
+        }
+    }
+}
