@@ -45,7 +45,7 @@ foreach($res->statuses as $post){
         'rawData' => $rawTwitterPost->toJson()
     ];
 
-    $sql = $db->prepare("INSERT INTO crawl_post (pId, extId, content, postedAt, rawData) VALUES (:pId, :extId, :content, :postedAt, :rawData)");
+    $sql = $db->prepare("INSERT INTO crawl_tw_post (pId, extId, content, postedAt, rawData) VALUES (:pId, :extId, :content, :postedAt, :rawData)");
 
     foreach($insertValues as $key => $value) {
         $sql->bindValue(':' . $key , $value);

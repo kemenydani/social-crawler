@@ -3,13 +3,13 @@
  * Created by IntelliJ IDEA.
  * User: Daniel Kemeny
  * TimeMachine: 26.01.2019
- * Time: 16:58
+ * Time: 17:07
  */
 
-namespace App\data;
+namespace App\model\twitter;
 
 
-class Post implements PostInterface
+class TwitterPostMetaData
 {
 
 }

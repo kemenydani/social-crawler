@@ -6,10 +6,10 @@
  * Time: 17:38
  */
 
-namespace App\data\core;
+namespace App\lib;
 
 
-use App\database\DataBaseConfigInterface;
+use App\config\DataBaseConfigInterface;
 
 class DB extends \PDO
 {
@@ -17,18 +17,16 @@ class DB extends \PDO
      * @var \PDOStatement|null
      */
     private $statement = null;
-    /**
-     * @var DataBaseConfigInterface|null
-     */
+
     private $dbc = null;
     
     public function __construct(DataBaseConfigInterface $dbc)
     {
         parent::__construct(...array_values([
-            'dsn' => 'mysql:host='. $this->dbc::HOST .';dbname='. $this->dbc::DATABASE_NAME .'',
-            'userName' => $this->dbc::USER_NAME,
-            'password' => $this->dbc::PASSWORD,
-            'options' => $this->dbc::OPTIONS
+            'dsn' => 'mysql:host='. $dbc::getHost() .';dbname='. $dbc::getDatabase() .'',
+            'userName' => $dbc::getUser(),
+            'password' => $dbc::getPassword(),
+            'options' => $dbc::getOptions()
         ]));
 
         $this->dbc = $dbc;
@@ -45,20 +43,13 @@ class DB extends \PDO
     public function insert(string $tableName, array $parameters = []): bool
     {
         $commaSeparatedNames = implode(',', array_keys($parameters));
-        $commaSeparatedBinds = join(',', array_pad([], count($parameters), ','));
+        $commaSeparatedBinds = join(',', array_pad([], count($parameters), '?'));
 
         $tableName = DB::prefix($tableName);
 
-        $sqlStatement = /** @lang text */
-        <<<STATEMENT
-            INSERT INTO 
-            $tableName 
-            ($commaSeparatedNames) 
-            VALUES 
-            ($commaSeparatedBinds)
-STATEMENT;
+        $sqlStatement = "INSERT IGNORE INTO {$tableName} ({$commaSeparatedNames}) VALUES ({$commaSeparatedBinds})";
 
-        $this->statement = $this->prepareBind($sqlStatement);
+        $this->statement = $this->prepareBind($sqlStatement, array_values($parameters));
         /* @var $wasInserted bool */
         $wasInserted = $this->statement->execute();
 
@@ -112,11 +103,12 @@ STATEMENT;
      * @param array|mixed $bindAble
      * @return \PDOStatement
      */
-    private function prepareBind(string $statement, $bindAble = null): \PDOStatement
+    private function prepareBind(string $statement, $bindAble = null)
     {
         $this->statement = $this->prepare($statement);
 
-        if(!is_array($bindAble) && $bindAble !== null ) $bindAble = [$bindAble];
+        if($bindAble === null) $bindAble = [];
+        if(!is_array($bindAble)) $bindAble = [$bindAble];
         
         $bindIndex = 1;
         foreach($bindAble as $parameterName => $parameterValue)
@@ -150,6 +142,6 @@ STATEMENT;
      */
     public function prefix(string $table): string
     {
-        return $this->dbc::PREFIX . $table;
+        return $this->dbc::getPrefix() . $table;
     }
 }

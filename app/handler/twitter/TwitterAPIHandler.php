@@ -6,43 +6,44 @@
  * Time: 19:37
  */
 
-namespace App\api\twitter;
+namespace App\handler\twitter;
 
 
 use Abraham\TwitterOAuth\TwitterOAuth;
-use App\api\APIController;
-use App\data\twitter\TwitterPost;
+use App\config\ApiConfigTwitterInterface;
+use App\handler\APIHandler;
+use App\model\twitter\TwitterPost;
 
-class TwitterAPIController extends APIController implements TwitterAPIControllerInterface
+class TwitterAPIHandler extends APIHandler
 {
     private $ac = null;
     private $api = null;
 
     /**
-     * TwitterAPIController constructor.
-     * @param TwitterApiConfig $ac
+     * TwitterAPIHandler constructor.
+     * @param ApiConfigTwitterInterface $ac
      */
-    public function __construct(TwitterApiConfig $ac)
+    public function __construct(ApiConfigTwitterInterface $ac)
     {
         $this->ac = $ac;
 
         $this->api = new TwitterOAuth(...array_values([
-            'consumerKey' => $ac::CONSUMER_KEY,
-            'consumerSecret' => $ac::CONSUMER_SECRET,
-            'oauthToken' => $ac::OAUTH_TOKEN,
-            'oauthTokenSecret' => $ac::OAUTH_TOKEN_SECRET
+            'consumerKey' => $ac::getConsumerKey(),
+            'consumerSecret' => $ac::getConsumerSecret(),
+            'oauthToken' => $ac::getOauthToken(),
+            'oauthTokenSecret' => $ac::getOauthTokenSecret()
         ]));
     }
 
     /**
-     * @param array $query
+     * @param array $queryParams
      * @return TwitterPost[]|array
      */
-    public function getPosts(array $query = [])
+    public function getPosts(array $queryParams = [])
     {
         try
         {
-            $apiResponse = $this->api->get("search/tweets", $query);
+            $apiResponse = $this->api->get("search/tweets", $queryParams);
         }
         catch (\Exception $e)
         {
@@ -51,7 +52,7 @@ class TwitterAPIController extends APIController implements TwitterAPIController
 
         if ($apiResponse)
         {
-            return TwitterAPIController::processResponse($apiResponse);
+            return TwitterAPIHandler::parseResponse($apiResponse);
         }
         return [];
     }
@@ -60,7 +61,7 @@ class TwitterAPIController extends APIController implements TwitterAPIController
      * @param $response
      * @return TwitterPost[]|array
      */
-    public static function processResponse($response)
+    public static function parseResponse($response)
     {
         $posts = [];
 
@@ -75,11 +76,4 @@ class TwitterAPIController extends APIController implements TwitterAPIController
         return $posts;
     }
 
-    /**
-     * @return TwitterOAuth|null
-     */
-    public function getApi(): ?TwitterOAuth
-    {
-        return $this->api;
-    }
 }

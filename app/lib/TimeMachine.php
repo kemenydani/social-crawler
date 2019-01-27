@@ -6,7 +6,7 @@
  * Time: 17:33
  */
 
-namespace App\data\core;
+namespace App\lib;
 
 
 abstract class TimeMachine

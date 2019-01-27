@@ -6,7 +6,7 @@
  * Time: 17:25
  */
 
-namespace App\data\core;
+namespace App\lib;
 
 
 trait JSON

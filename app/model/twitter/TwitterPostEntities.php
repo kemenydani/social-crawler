@@ -6,7 +6,7 @@
  * Time: 17:05
  */
 
-namespace App\data\twitter;
+namespace App\model\twitter;
 
 
 class TwitterPostEntities

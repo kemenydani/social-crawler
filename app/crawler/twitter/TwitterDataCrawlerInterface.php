@@ -6,7 +6,7 @@
  * Time: 18:11
  */
 
-namespace App\crawler;
+namespace App\crawler\twitter;
 
 
 interface TwitterDataCrawlerInterface

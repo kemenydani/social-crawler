@@ -6,10 +6,10 @@
  * Time: 17:04
  */
 
-namespace App\data\twitter;
+namespace App\model\twitter;
 
 
-use App\data\core\JSON;
+use App\lib\JSON;
 
 class TwitterPostUser
 {
